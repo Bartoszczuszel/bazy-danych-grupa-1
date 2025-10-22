@@ -1,0 +1,179 @@
+ZADANIE 1
+1)
+create table pracownik (
+id_pracownika integer primary key auto_increment,
+imie varchar(40) not null,
+nazwisko varchar(60) not null,
+data_urodzenia date not null);
+
+2)
+insert into pracownik (imie, nazwisko, data_urodzenia) values ('Jan', 'Kowalski', '2000-01-01');
+insert into pracownik (imie, nazwisko, data_urodzenia) values ('Janek', 'Kowalski', '2004-01-01');
+insert into pracownik (imie, nazwisko, data_urodzenia) values ('Michał', 'Kowalski', '2006-01-01');
+
+3)
+update pracownik set data_urodzenia = '2001-02-02' where id=1;
+
+
+ZADANIE 2
+1)
+create table zadanie (
+id_zadania integer primary key auto_increment,
+nazwa_zadania varchar(150) not null,
+priorytet enum('normalny','wysoki','niski'),
+opis text,
+foreign key (pracownik) references pracownik(id_pracownika) on delete set null);
+
+2)
+update zadanie set priorytet = 'normalny';
+
+3)
+insert into zadanie (nazwa_zadania, priorytet, opis) values ('sprzatanie', 'normalny', 'prosze posprzatac');
+
+ZADANIE 3
+1) create table projekt (
+id_projektu integer primary key auto_increment,
+nazwa_projektu varchar(150) not null,
+data_rozpoczecia date not null,
+data_zakonczenia date);
+
+2)
+alter table projekt add foreign key (menedzer_projektu) references pracownik;
+
+3)
+insert into projekt (nazwa_projektu, data_rozpoczecia, data_zakonczenia) values ('projekt1','2025-10-21','2025-10-22');
+insert into projekt (nazwa_projektu, data_rozpoczecia, data_zakonczenia) values ('projekt2','2025-10-22');
+
+4)
+alter table zadanie add foreign key (projekt) references(projekt) on delete cascade;
+
+5)
+insert into zadanie values (id) ('1','2');
+
+ZADANIE 4
+1)
+create table sprint (
+id_sprintu integer primary key auto_increment,
+numer_sprintu integer,
+data_rozpoczecia date,
+data_zakonczenia date);
+
+2)
+alter table zadanie add foreign key (sprint) references sprint on delete set null;
+
+3)
+insert into sprint values
+
+ZADANIE 5
+1)
+create table status (
+id_statusu integer primary key auto_increment,
+nazwa_statusu varchar(20));
+
+2)
+insert into status (nazwa_statusu) values ('zakonczony');
+insert into status (nazwa_statusu) values ('nierozpoczety');
+insert into status (nazwa_statusu) values ('nieudany');
+
+3)
+create table zadanie_has_status (
+id_zdarzenia integer primary key auto_increment,
+data_zdarzenia datetime,
+foreign key (id_zadania) references zadanie,
+foreign key (id_statusu) references status);
+
+4)
+insert into zadanie_has_status (data_zdarzenia, id_zadania, id_statusu) values ('2025-01-01', '183', '938');
+insert into zadanie_has_status (data_zdarzenia, id_zadania, id_statusu) values ('2025-02-02', '287', '138');
+insert into zadanie_has_status (data_zdarzenia, id_zadania, id_statusu) values ('2025-08-06', '39', '45');
+
+5)
+delete from projekt where id_projektu = 1;
+6)
+drop table sprint;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
