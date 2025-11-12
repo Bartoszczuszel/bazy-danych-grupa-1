@@ -1,0 +1,100 @@
+1)
+create table pracownik (
+id integer primary key auto_increment,
+imie varchar(50) not null,
+nazwisko varchar(100) not null,
+data_urodzenia date,
+stanowisko enum ("sprzedawca", "magazynier", "księgowa");
+
+2)
+insert into pracownik (imie, nazwisko, stanowisko) values ("Jan", "Kowalski", "sprzedawca");
+insert into pracownik (imie, nazwisko, stanowisko) values ("Janusz", "Kowalski", "sprzedawca");
+insert into pracownik (imie, nazwisko, stanowisko) values ("Janek", "Kowalski", "sprzedawca");
+
+3)
+create table dział (
+id integer primary key auto_increment,
+nazwa varchar(255));
+
+4)
+insert into dział (nazwa) values ("sprzedaż"), ("księgowość"), ("magazyn");
+
+5)
+alter table pracownik alter column stanowisko set default "sprzedawca";
+
+6)
+alter table pracownik add column pensja float(7,2);
+
+update pracownik set pensja = 4500.00 where id = "1";
+update pracownik set pensja = 5300.00 where id = "2";
+
+7)
+alter table dział change column nazwa nazwa_dzialu varchar(50);
+alter table dział change id id_dzialu integer auto_increment;
+
+alter table pracownik change id id_pracownika integer auto_increment;
+
+8)
+delete from pracownik order by id_pracownika desc limit 1;
+
+9)
+alter table pracownik add column dział int;
+
+alter table pracownik add constraint fk_pracownik_dzial foreign key (dzial) references dzial(id_dzialu) on delete restrict on update cascade;
+
+10)
+create table stanowisko (
+id_stanowiska primary key auto_increment,
+nazwa_stanowiska varchar(255));
+
+insert into stanowsiko (nazwa_stanowiska) select distinct stanowisko from pracownik;
+
+11)
+alter table pracownik add column id_stanowiska int;
+
+update pracownik p join stanowisko s on p.stanowisko = s.nazwa_stanowiska set p.id_stanowiska = s.id_stanowiska;
+
+alter table pracownik drop column stanowisko;
+
+aler table pracownik add constraint fk_pracownik_stanowisko foreign key (id_stanowiska) references stanowisko(id_stanowiska);
+
+12)
+alter table pracownik drop foreign key fk_pracownik_dzial;
+
+alter table pracownik add constraint fk_pracownik_dzial foreign key (dzial) references dzial(id_dzialu) on delete set null on update cascade;
+
+
+
+NA PODSTAWIE SCHEMATU
+1)
+select nazwisko from pracownik order by nazwisko desc;
+
+2)
+select imie, nazwisko, pensja from pracownik where rok_urodzenia > 1979;
+
+3)
+select * from pracownik where pensja between 3500 and 5000;
+
+4)
+select * from stan_magazynowy where ilosc > 10;
+
+5)
+select * from towar where nazwa_towaru like 'A%' OR nazwa_towaru like 'B%' OR nazwa_towaru like 'C%';
+
+6)
+select * from klient where czy_firma = 0;
+
+7)
+select * from zamowienie order by data_zamowienia DESC limit 10;
+
+8)
+select * from pracownik order by pensja ASC limit 5;
+
+9)
+select * from towar where nazwa_towaru NOT LIKE '%a'order by cena_zakupu desc limit 10;
+
+11)
+create table towary_powyzej_100 as select * from towar where cena_zakupu >= 100;
+
+12)
+create table pracownik_50_plus as select * from pracownik where year(curdate()) - year(data_urodzenia) >= 50;
