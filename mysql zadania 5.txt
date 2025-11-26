@@ -1,0 +1,107 @@
+CZĘŚĆ DRUGA
+
+1)
+SELECT p.imie, p.nazwisko, d.nazwa AS nazwa_dzialu FROM pracownik p JOIN dzial d ON p.dzial = d.id_dzialu;
+
+2)
+SELECT t.nazwa_towaru, k.nazwa_kategori, sm.ilosc FROM towar t JOIN kategoria k ON t.kategoria = k.id_kategori JOIN stan_magazynowy sm ON t.id_towaru = sm.towar ORDER BY sm.ilosc DESC;
+
+3)
+SELECT z.* FROM zamowienie z JOIN status_zamowienia sz ON z.status_zamowienia = sz.id_statusu_zamowienia WHERE sz.nazwa_statusu_zamowienia = 'anulowane';
+
+4)
+SELECT k.* FROM klient k JOIN adres_klienta ak ON k.id_klienta = ak.klient JOIN typ_adresu ta ON ak.typ_adresu = ta.id_typu WHERE ta.nazwa = 'podstawowy' AND ak.miejscowosc = 'Olsztyn';
+
+5)
+SELECT jm.nazwa FROM jednostka_miara jm LEFT JOIN stan_magazynowy sm ON jm.id_jednostki = sm.jm WHERE sm.jm IS NULL;
+
+6)
+SELECT z.numer_zamowienia, t.nazwa_towaru, pz.ilosc, pz.cena FROM zamowienia z JOIN pozycja_zamowienia pz ON z.id_zamowienia = pz.zamowienie JOIN towar t ON pz.towar = t.id_towaru WHERE YEAR(z.data_zamowienia) = 2018;
+
+7)
+CREATE TABLE towary_full_info AS SELECT t.nazwa_towaru, t.cena_zakupu, k.nazwa_kategori AS kategoria, sm.ilosc, jm.nazwa AS jednostka_miary FROM towar t JOIN kategoria k ON t.kategoria = k.id_kategori JOIN stan_magazynowy sm ON t.id_towaru = sm.towar JOIN jednostka_miary jm ON sm.jm jm.id_jednostki;
+
+8)
+SELECT pz.* FROM pozycja_zamowienia pz JOIN zamowienie z ON pz.zamowienie = z.id_zamowienia ORDER BY z.data_zamowienia ASC LIMIT 5;
+
+9)
+SELECT z.* FROM zamowienie z JOIN status_zamowienia sz ON z.status_zamowienia = sz.id_zamowienia WHERE sz.nazwa_statusu_zamowienia != 'zrealizowane';
+
+10)
+SELECT * FROM adres_klienta WHERE kod NOT
+
+
+
+Funkcje, agregacja, grupowanie
+
+1)
+SELECT imie, nazwisko, YEAR(data_urodzenia) AS rok_urodzenia FROM pracownik;
+
+2)
+SELECT imie, nazwisko, YEAR(CURDATE()) - YEAR(data_urodzenia) AS wiek FROM pracownik;
+
+3)
+SELECT d.nazwa_dzialu, COUNT(p.id_pracownika) AS liczba_pracownikow FROM dzial d LEFT JOIN pracownik p ON d.id_dzialu = p.dzial GROUP BY d.id_dzialu, d.nazwa_dzialu;
+
+4)
+SELECT k.nazwa_kategori, COUNT(t.id_towaru) AS liczba_produktow FROM kategoria k LEFT JOIN towar t ON k.id_kategori = t.kategoria GROUP BY k.id_kategori, k.nazwa_kategori;
+
+5)
+SELECT k.nazwa_kategori, GROUP_CONCAT(t.nazwa_towaru) AS lista_produktow FROM kategoria k LEFT JOIN towar t ON k.id_kategori = t.kategoria GROUP BY k.id_kategori, k.nazwa_kategori;
+
+6)
+SELECT ROUND(AVG(pensja), 2) AS srednia_pensja FROM pracownik;
+
+7)
+SELECT ROUND(AVG(pensja), 2) AS srednia_pensja FROM pracownik WHERE YEAR(CURDATE()) - YEAR(data_zatrudnienia) >= 5;
+
+8)
+SELECT t.nazwa_towaru, SUM(pz.ilosc) AS laczna_ilosc_sprzedanych FROM towar t JOIN pozycja_zamowienia pz ON t.id_towaru = pz.towar GROUP BY t.id_towaru, t.nazwa_towaru ORDER BY laczna_ilosc_sprzedanych DESC LIMIT 10;
+
+9)
+SELECT z.numer_zamowienia, SUM(pz.ilosc * pz.cena) AS wartosc_zamowienia FROM zamowienie z JOIN pozycja_zamowienia pz ON z.id_zamowienia = pz.zamowienie WHERE YEAR(z.data_zamowienia) = 2017 AND MONTH(z.data_zamowienia) BETWEEN 1 AND 3 GROUP BY z.id_zamowienia, z.numer_zamowienia;
+
+10)
+SELECT p.imie, p.nazwisko, SUM(pz.ilosc * pz.cena) AS suma_wartosci_zamowien FROM pracownik p JOIN zamowienie z ON p.id_pracownika = z.pracownik_id_pracownika JOIN pozycja_zamowienia pz ON z.id_zamowienia = pz.zamowienie GROUP BY p.id_pracownika, p.imie, p.nazwisko ORDER BY suma_wartosci_zamowien DESC;
+
+11)
+SELECT d.nazwa_dzialu, MIN(p.pensja) AS minimalna_pensja, MAX(p.pensja) AS maksymalna_pensja, ROUND(AVG(p.pensja), 2) AS srednia_pensja FROM dzial d LEFT JOIN pracownik p ON d.id_dzialu = p.dzial GROUP BY d.id_dzialu, d.nazwa_dzialu;
+
+12)
+SELECT k.pelna_nazwa, SUM(pz.ilosc * pz.cena) AS wartosc_zamowienia FROM klient k JOIN zamowienie z ON k.id_klienta = z.klientJOIN pozycja_zamowienia pz ON z.id_zamowienia = pz.zamowienie GROUP BY k.id_klienta, k.pelna_nazwa, z.id_zamowienia ORDER BY wartosc_zamowienia DESC LIMIT 10;
+
+13)
+SELECT YEAR(z.data_zamowienia) AS rok, SUM(pz.ilosc * pz.cena) AS przychod FROM zamowienie z JOIN pozycja_zamowienia pz ON z.id_zamowienia = pz.zamowienie GROUP BY YEAR(z.data_zamowienia) ORDER BY przychod DESC;
+
+14)
+SELECT SUM(pz.ilosc * pz.cena) AS suma_anulowanych FROM zamowienie z JOIN pozycja_zamowienia pz ON z.id_zamowienia = pz.zamowienieJOIN status_zamowienia sz ON z.status_zamowienia = sz.id_statusu_zamowienia WHERE sz.nazwa_statusu_zamowienia = 'anulowane';
+
+15)
+SELECT ak.miejscowosc, COUNT(DISTINCT z.id_zamowienia) AS liczba_zamowien, SUM(pz.ilosc * pz.cena) AS suma_zamowien FROM adres_klienta ak JOIN klient k ON ak.klient = k.id_klienta JOIN zamowienie z ON k.id_klienta = z.klient JOIN pozycja_zamowienia pz ON z.id_zamowienia = pz.zamowienie JOIN typ_adresu ta ON ak.typ_adresu = ta.id_typu WHERE ta.nazwa = 'podstawowy' GROUP BY ak.miejscowosc;
+
+16)
+SELECT SUM(pz.ilosc * (pz.cena - t.cena_zakupu)) AS dochod FROM zamowienie z JOIN pozycja_zamowienia pz ON z.id_zamowienia = pz.zamowienie JOIN towar t ON pz.towar = t.id_towaru JOIN status_zamowienia sz ON z.status_zamowienia = sz.id_statusu_zamowienia WHERE sz.nazwa_statusu_zamowienia = 'zrealizowane';
+
+17)
+SELECT YEAR(z.data_zamowienia) AS rok, SUM(pz.ilosc * pz.cena) AS przychod, SUM(pz.ilosc * t.cena_zakupu) AS koszt_zakupu, SUM(pz.ilosc * (pz.cena - t.cena_zakupu)) AS dochod FROM zamowienie z JOIN pozycja_zamowienia pz ON z.id_zamowienia = pz.zamowienie JOIN towar t ON pz.towar = t.id_towaru GROUP BY YEAR(z.data_zamowienia) ORDER BY rok;
+
+18)
+SELECT k.nazwa_kategori, SUM(sm.ilosc * t.cena_zakupu) AS wartosc_magazynu FROM kategoria k JOIN towar t ON k.id_kategori = t.kategoria JOIN stan_magazynowy sm ON t.id_towaru = sm.tower GROUP BY k.id_kategori, k.nazwa_kategori ORDER BY wartosc_magazynu DESC;
+
+19)
+SELECT MONTH(data_urodzenia) AS miesiac, COUNT(*) AS liczba_pracownikow FROM pracownik GROUP BY MONTH(data_urodzenia) ORDER BY miesiac;
+
+20)
+SELECT imie, nazwisko, data_urodzenia FROM pracownik WHERE MONTH(data_urodzenia) = MONTH(CURDATE()) ORDER BY DAY(data_urodzenia) ASC;
+
+21)
+SELECT p1.imie AS imie_A, p1.nazwisko AS nazwisko_A, p2.imie AS imie_B, p2.nazwisko AS nazwisko_B, (YEAR(p2.data_urodzenia) - YEAR(p1.data_urodzenia)) AS roznica_wieku FROM pracownik p1 JOIN pracownik p2 ON YEAR(p2.data_urodzenia) - YEAR(p1.data_urodzenia) >= 10 ORDER BY roznica_wieku DESC;
+
+22)
+SELECT YEAR(z.data_zamowienia) AS rok, MONTH(z.data_zamowienia) AS miesiac, SUM(pz.ilosc * pz.cena) AS przychod FROM zamowienie z JOIN pozycja_zamowienia pz ON z.id_zamowienia = pz.zamowienie GROUP BY YEAR(z.data_zamowienia), MONTH(z.data_zamowienia) ORDER BY przychod DESC LIMIT 1;
+
+23)
+SELECT k.pelna_nazwa, SUM(pz.ilosc * pz.cena) AS laczna_sprzedaz, CASE WHEN SUM(pz.ilosc * pz.cena) > 10000 THEN 'rabat 5%' ELSE 'brak rabatu' END AS status_rabatu FROM klient k JOIN zamowienie z ON k.id_klienta = z.klient JOIN pozycja_zamowienia pz ON z.id_zamowienia = pz.zamowienie GROUP BY k.id_klienta, k.pelna_nazwa;
+
+24)
+SELECT p.imie, p.nazwisko, SUM(pz.ilosc * pz.cena) AS suma_sprzedazy, ROUND((SUM(pz.ilosc * pz.cena) / (SELECT SUM(pz2.ilosc * pz2.cena) FROM pozycja_zamowienia pz2)) * 100, 2) AS procent_calkowitej_sprzedazy FROM pracownik p JOIN zamowienie z ON p.id_pracownika = z.pracownik_id_pracownika JOIN pozycja_zamowienia pz ON z.id_zamowienia = pz.zamowienie GROUP BY p.id_pracownika, p.imie, p.nazwisko ORDER BY suma_sprzedazy DESCLIMIT 5;
