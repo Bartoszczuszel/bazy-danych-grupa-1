@@ -1,0 +1,35 @@
+4)
+a) create table Produkt (id_produktu INT auto_increment primary key, nazwa_produktu varchar(40) not null, data_produkcji date default '2017-02-01', cena decimal(10,2) not null, kategoria ENUM('spoz', 'chemia', 'kosmetyki', 'dla_zwierzat'));
+b) create table Sprzedaz (id_produktu INT, ilosc smallint unsigned default 1, data_sprzedazy date, rabat decimal(4,2), PRIMARY KEY (id_produktu, data_sprzedazy), FOREIGN KEY(id_produktu) REFERENCES Produkt(id_produktu) ON DELETE CASCADE);
+
+5)
+alter table Produkt change COLUMN kategoria rodzaj ENUM('spoz', 'chemia', 'kosmetyki', 'dla_zwierzat') DEFAULT 'chemia';
+
+6)
+insert into Produkt (nazwa_produktu, data_produkcji, cena, rodzaj) SELECT nazwa AS nazwa_produktu, DATE_ADD(data_ur, INTERVAL 310 YEAR) AS data_produkcji, 400 AS cena, default(rodzaj) FROM kreatura;
+
+7)
+DELETE FROM Produkt WHERE nazwa_produktu LIKE '%e%' OR nazwa_produktu LIKE '%i%';
+
+8)
+alter table Sprzedaz DROP FOREIGN KEY sprzedaz_ibfk_1;
+
+9)
+a) SELECT nazwisko, zarobki FROM pracownicy WHERE id_departamentu IN(SELECT id_departamentu FROM departament WHERE nazwa IN ('Marketing', 'Shipping')) AND zarobki BETWEEN 2000 AND 7000 ORDER BY zarobki, nazwisko;
+
+b) SELECT d.nazwa, SUM(p.zarobki) AS suma_zarobkow, AVG(p.zarobki) AS srednia_zarobkow) FROM departament d JOIN pracownicy p ON d.id_departamentu = p.id_departamentu GROUP BY d.id_departamentu, d.nazwa HAVING COUNT(p.id_pracownikow) >= 3;
+
+c)
+SELECT imie, nazwisko, zarobki FROM pracownicy WHERE zarobki > (SELECT AVG(zarobki) FROM pracownicy WHERE id_departamentu = (SELECT id_departamentu FROM departament WHERE nazwa = 'Shipping'));
+
+d)
+SELECT d.nazwa FROM departament d LEFT JOIN pracownicy p ON d.id_departamentu = p.id_departamentu WHERE p.id_pracownika IS NULL;
+
+e)
+SELECT p.imie, p.nazwisko, p.data_zatrudnienia FROM pracownicy p JOIN department d ON p.id_departamentu = d.id_departamentu WHERE d.nazwa = 'Shipping' ORDER BY p.data_zatrudnienia DESC;
+
+f)
+SELECT m.imie AS manager_imie, m.nazwisko AS manager_nazwisko, GROUP_CONCAT(CONCAT(p.imie, ' ',p.nazwisko) SEPARATOR ', ') AS podwladni FROM pracownicy m JOIN pracownicy p ON m.id_pracownika = p.id_managera GROUP BY m.id_pracownika, m.imie, m.nazwisko;
+
+g)SELECT imie, nazwisko, stanowisko, TIMESTAMPDIFF (YEAR, data_zatrudnienia, CURDATE()), zarobki * TIMESTAMPDIFF(YEAR, data_zatrudnienia, CURDATE()) FROM pracownik WHERE stanowisko LIKE 'S%';
+
